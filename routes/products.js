@@ -4,8 +4,14 @@ const Product = require('../models/product');
 // @route   GET /products
 // @desc    Get products
 // @access  Public
-router.get('/', (req, res) => {
-  res.send('Get products');
+router.get('/', async (req, res, next) => {
+  try {
+    const products = await Product.find();
+    res.send(products);
+  } catch (error) {
+    console.log(error.message);
+    next(error);
+  }
 });
 
 // @route   POST /products
@@ -32,8 +38,19 @@ router.post('/', async (req, res, next) => {
 // @route   GET /products/:id
 // @desc    Get product
 // @access  Public
-router.get('/:id', (req, res) => {
-  res.send('Get product');
+router.get('/:id', async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      const error = new Error('Product not found');
+      error.status = 404;
+      return next(error);
+    }
+    res.send(product);
+  } catch (error) {
+    console.error(error.message);
+    next(error);
+  }
 });
 
 // @route   PATCH /products/:id
