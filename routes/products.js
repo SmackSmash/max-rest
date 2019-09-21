@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const Product = require('../models/product');
 
 // @route   GET /products
 // @desc    Get products
@@ -10,16 +11,22 @@ router.get('/', (req, res) => {
 // @route   POST /products
 // @desc    Add product
 // @access  Private
-router.post('/', (req, res) => {
+router.post('/', async (req, res, next) => {
   const { name, price } = req.body;
-  const product = {
+  const product = new Product({
     name,
     price
-  };
-  res.status(201).send({
-    message: 'Add product',
-    product
   });
+  try {
+    await product.save();
+    res.status(201).send({
+      message: 'Add product',
+      product
+    });
+  } catch (error) {
+    console.log(error.message);
+    next(error);
+  }
 });
 
 // @route   GET /products/:id
