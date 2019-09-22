@@ -32,6 +32,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/products', require('./routes/products'));
 app.use('/orders', require('./routes/orders'));
+app.use('/users', require('./routes/users'));
 
 // Error handling
 app.use((req, res, next) => {
