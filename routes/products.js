@@ -6,8 +6,18 @@ const Product = require('../models/product');
 // @access  Public
 router.get('/', async (req, res, next) => {
   try {
-    const products = await Product.find();
-    res.send(products);
+    const products = await Product.find().select('name price _id');
+    const response = {
+      count: products.length,
+      products: products.map(({ _doc }) => ({
+        ..._doc,
+        request: {
+          type: 'GET',
+          url: `http://localhost:5000/products/${_doc._id}`
+        }
+      }))
+    };
+    res.send(response);
   } catch (error) {
     console.error(error.message);
     next(error);
@@ -26,7 +36,7 @@ router.post('/', async (req, res, next) => {
   try {
     await product.save();
     res.status(201).send({
-      message: 'Add product',
+      message: 'Added product',
       product
     });
   } catch (error) {
@@ -40,13 +50,19 @@ router.post('/', async (req, res, next) => {
 // @access  Public
 router.get('/:id', async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).select('-__v');
     if (!product) {
       const error = new Error('Product not found');
       error.status = 404;
       return next(error);
     }
-    res.send(product);
+    res.send({
+      product,
+      request: {
+        type: 'GET',
+        url: `http://localhost:5000/products/${req.params.id}`
+      }
+    });
   } catch (error) {
     console.error(error.message);
     next(error);
@@ -82,7 +98,11 @@ router.delete('/:id', async (req, res, next) => {
       error.status = 404;
       return next(error);
     }
-    res.send(product);
+    const response = {
+      message: 'Product deleted',
+      product
+    };
+    res.send(response);
   } catch (error) {
     console.error(error.message);
     next(error);
