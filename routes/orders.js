@@ -63,7 +63,9 @@ router.post('/', async (req, res, next) => {
 // @access  Public
 router.get('/:id', async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.id).select('-__v');
+    const order = await Order.findById(req.params.id)
+      .select('-__v')
+      .populate('product', '-__v');
     if (!order) {
       const error = new Error('Order not found');
       error.status = 404;
