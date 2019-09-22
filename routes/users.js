@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const auth = require('../middleware/auth');
 const { jwtSecret } = require('../config/keys');
 
 // @route   POST /users/signup
@@ -69,13 +70,18 @@ router.post('/signin', async (req, res, next) => {
 // @route   DELETE /users/:idv
 // @desc    Delete user
 // @access  Private
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', auth, async (req, res, next) => {
   const { id } = req.params;
   try {
     const user = await User.findById(id);
     if (!user) {
       const error = new Error(`No user exists with ID ${id}`);
       error.status = 404;
+      return next(error);
+    }
+    if (user.email !== req.user.email) {
+      const error = new Error('Unauthorized');
+      error.status = 401;
       return next(error);
     }
     await User.findByIdAndDelete(id);
