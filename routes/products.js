@@ -9,7 +9,7 @@ router.get('/', async (req, res, next) => {
     const products = await Product.find();
     res.send(products);
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     next(error);
   }
 });
@@ -30,7 +30,7 @@ router.post('/', async (req, res, next) => {
       product
     });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     next(error);
   }
 });
@@ -56,15 +56,37 @@ router.get('/:id', async (req, res, next) => {
 // @route   PATCH /products/:id
 // @desc    Update product
 // @access  Private
-router.patch('/:id', (req, res) => {
-  res.send('Update product');
+router.patch('/:id', async (req, res, next) => {
+  try {
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body);
+    if (!product) {
+      const error = new Error('Product not found');
+      error.status = 404;
+      return next(error);
+    }
+    res.send(product);
+  } catch (error) {
+    console.error(error.message);
+    next(error);
+  }
 });
 
 // @route   DELETE /products/:id
 // @desc    Delete product
 // @access  Private
-router.delete('/:id', (req, res) => {
-  res.send('Delete product');
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const product = await Product.findByIdAndRemove(req.params.id);
+    if (!product) {
+      const error = new Error('Product not found');
+      error.status = 404;
+      return next(error);
+    }
+    res.send(product);
+  } catch (error) {
+    console.error(error.message);
+    next(error);
+  }
 });
 
 module.exports = router;

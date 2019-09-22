@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const { mongoURI } = require('../config/keys');
 
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false
+});
 
 mongoose.connection.once('open', () => console.log('Connected to DB'));
