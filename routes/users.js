@@ -30,7 +30,58 @@ router.post('/signup', async (req, res, next) => {
     const token = jwt.sign(payload, jwtSecret);
     res.send({ token });
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
+    next(error);
+  }
+});
+
+// @route   POST /users/signin
+// @desc    Sign in user
+// @access  Public
+router.post('/signin', async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      const error = new Error('Invalid credentials');
+      error.status = 401;
+      return next(error);
+    }
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      const error = new Error('Invalid credentials');
+      error.status = 401;
+      return next(error);
+    }
+    const payload = {
+      user: {
+        email
+      }
+    };
+    const token = jwt.sign(payload, jwtSecret);
+    res.send({ token });
+  } catch (error) {
+    console.error(error.message);
+    next(error);
+  }
+});
+
+// @route   DELETE /users/:idv
+// @desc    Delete user
+// @access  Private
+router.delete('/:id', async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      const error = new Error(`No user exists with ID ${id}`);
+      error.status = 404;
+      return next(error);
+    }
+    await User.findByIdAndDelete(id);
+    res.send(user);
+  } catch (error) {
+    console.error(error.message);
     next(error);
   }
 });
