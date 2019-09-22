@@ -1,12 +1,13 @@
 const router = require('express').Router();
 const Product = require('../models/product');
+const upload = require('../middleware/uploadImage');
 
 // @route   GET /products
 // @desc    Get products
 // @access  Public
 router.get('/', async (req, res, next) => {
   try {
-    const products = await Product.find().select('name price _id');
+    const products = await Product.find().select('-__v');
     const response = {
       count: products.length,
       products: products.map(({ _doc }) => ({
@@ -27,11 +28,13 @@ router.get('/', async (req, res, next) => {
 // @route   POST /products
 // @desc    Add product
 // @access  Private
-router.post('/', async (req, res, next) => {
+router.post('/', upload.single('image'), async (req, res, next) => {
   const { name, price } = req.body;
+  const { destination, filename } = req.file;
   const product = new Product({
     name,
-    price
+    price,
+    image: destination + filename
   });
   try {
     await product.save();

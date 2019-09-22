@@ -12,6 +12,9 @@ app.use(express.urlencoded({ extended: false }));
 // Server logging
 app.use(morgan('tiny'));
 
+// Serve images from static folder
+app.use('/uploads', express.static('uploads'));
+
 // CORS setup
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
