@@ -28,7 +28,7 @@ router.post('/signup', async (req, res, next) => {
         email
       }
     };
-    const token = jwt.sign(payload, jwtSecret);
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: '2 days' });
     res.send({ token });
   } catch (error) {
     console.error(error.message);
@@ -59,7 +59,7 @@ router.post('/signin', async (req, res, next) => {
         email
       }
     };
-    const token = jwt.sign(payload, jwtSecret);
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: '2 days' });
     res.send({ token });
   } catch (error) {
     console.error(error.message);
