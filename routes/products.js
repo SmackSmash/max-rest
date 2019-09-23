@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Product = require('../models/product');
 const upload = require('../middleware/uploadImage');
+const auth = require('../middleware/auth');
 
 // @route   GET /products
 // @desc    Get products
@@ -28,7 +29,7 @@ router.get('/', async (req, res, next) => {
 // @route   POST /products
 // @desc    Add product
 // @access  Private
-router.post('/', upload.single('image'), async (req, res, next) => {
+router.post('/', auth, upload.single('image'), async (req, res, next) => {
   const { name, price } = req.body;
   const { destination, filename } = req.file;
   const product = new Product({
@@ -75,7 +76,7 @@ router.get('/:id', async (req, res, next) => {
 // @route   PATCH /products/:id
 // @desc    Update product
 // @access  Private
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id', auth, async (req, res, next) => {
   try {
     const product = await Product.findByIdAndUpdate(req.params.id, req.body);
     if (!product) {
@@ -93,7 +94,7 @@ router.patch('/:id', async (req, res, next) => {
 // @route   DELETE /products/:id
 // @desc    Delete product
 // @access  Private
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', auth, async (req, res, next) => {
   try {
     const product = await Product.findByIdAndRemove(req.params.id);
     if (!product) {

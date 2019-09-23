@@ -23,12 +23,7 @@ router.post('/signup', async (req, res, next) => {
       password: hashed
     });
     await user.save();
-    const payload = {
-      user: {
-        email
-      }
-    };
-    const token = jwt.sign(payload, jwtSecret, { expiresIn: '2 days' });
+    const token = jwt.sign({ email }, jwtSecret, { expiresIn: '2 days' });
     res.send({ token });
   } catch (error) {
     console.error(error.message);
@@ -54,12 +49,7 @@ router.post('/signin', async (req, res, next) => {
       error.status = 401;
       return next(error);
     }
-    const payload = {
-      user: {
-        email
-      }
-    };
-    const token = jwt.sign(payload, jwtSecret, { expiresIn: '2 days' });
+    const token = jwt.sign({ email }, jwtSecret, { expiresIn: '2 days' });
     res.send({ token });
   } catch (error) {
     console.error(error.message);
@@ -79,7 +69,7 @@ router.delete('/:id', auth, async (req, res, next) => {
       error.status = 404;
       return next(error);
     }
-    if (user.email !== req.user.email) {
+    if (user.email !== req.user) {
       const error = new Error('Unauthorized');
       error.status = 401;
       return next(error);

@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Order = require('../models/order');
 const Product = require('../models/product');
+const auth = require('../middleware/auth');
 
 // @route   GET /orders
 // @desc    Get orders
@@ -30,7 +31,7 @@ router.get('/', async (req, res, next) => {
 // @route   POST /orders
 // @desc    Add order
 // @access  Private
-router.post('/', async (req, res, next) => {
+router.post('/', auth, async (req, res, next) => {
   const { productId, quantity } = req.body;
   const product = await Product.findById(productId);
   if (!product) {
@@ -87,7 +88,7 @@ router.get('/:id', async (req, res, next) => {
 // @route   DELETE /orders/:id
 // @desc    Delete order
 // @access  Private
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', auth, async (req, res, next) => {
   try {
     const order = await Order.findByIdAndRemove(req.params.id);
     if (!order) {
